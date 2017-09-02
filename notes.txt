@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Aug 30 15:02:35 2017
+
+@author: Anders
+"""
+
+? require age, gender, size, incidence tags?
+
+app to merge lesions vs clear tags out of association table and mark as alias?
+
+instead of hierarchy of tags, add all more generic tags as well so that a specific
+    match is even more favored ie *hands *distal extremities *extremities 
