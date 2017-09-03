@@ -170,11 +170,43 @@ def get_lesions(session, tags):
             probs = final.loc[i, :]
             probs = probs.drop('post')
             final.set_value(i, 'post', probs.product())
-        
     return final.sort_values(by='post', ascending = False)
 
+def def_container_tag(session, tag, container_name, update_lesions = False):
+    tag = get_or_make_tag(session, tag)
+    container = get_or_make_tag(session, container_name)
+    tag.containers.append(container)
+    session.commit()
+    if update_lesions:
+        lesions = session.query(Lesion).join(Association).\
+                filter(Association.lesion_id == Lesion.id,
+                       Association.tag_id == Tag.id,
+                       Association.tag == tag).all()
+        for l in lesions:
+            get_or_make_assoc(session, container, l)
+    session.commit()
+    return
+    
+    
+def upvote_ddx(session, x):
+    for l in x.ddxs:
+        for a in x.tags:
+            q = session.query(Association).filter_by(lesion = l, tag = a.tag)
+            if session.query(q.exists()).scalar():
+                assoc = q.first()
+                assoc.upvotes += 1
+            else:
+                new = Association(lesion = l, tag = a.tag)
+                session.add(new)
+            session.commit()
+    return
 
-
+def process_ddx(session):
+    lesions = session.query(Lesion).all()
+    for l in lesions:
+        upvote_ddx(session, l)
+    return
+    
 
 def set_abs_incidence(session):
     lesions = session.query(Lesion).all()
