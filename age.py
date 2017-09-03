@@ -14,7 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.orm import backref
 
-from create_schema import Tag, Lesion, Association
+from create_schema import Tag, Lesion
 from functions import *
 
 engine = create_engine('sqlite:///ST.db')
@@ -30,8 +30,11 @@ sheets = xl.sheet_names
 for s in sheets:
     table = xl.parse(s, header = None)
     table[0] = table[0].str.lower()
-    tag = table.iloc[0,0]
-    table = table.iloc[1:, :].dropna(subset = [0])
-    load_data(session, [tag], table)
+    age_range = table.iloc[0,0]
+    lesions = list(table.iloc[1:, 0].dropna())
+    for l in lesions:
+        lesion = get_or_make_lesion(session, l)
+        lesion = add_age(session, lesion, age_range)
+        session.commit()
     
 session.close()

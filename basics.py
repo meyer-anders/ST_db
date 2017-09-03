@@ -73,9 +73,9 @@ for column in data.iloc[:, 1:]:
         locations = data.loc[6, column].split(',')
         for l in locations:
             tag = get_or_make_tag(session, l)
-            if not tag in lesion.tags:
-                lesion.tags.append(tag)
-           # assoc = get_or_make_assoc(session, tag, lesion)
+#            if not tag in lesion.tags:
+#                lesion.tags.append(tag)
+            get_or_make_assoc(session, tag, lesion)
             session.commit()
     # ddx
     ddx = list(data.loc[7:, column].dropna().drop_duplicates().str.lower())

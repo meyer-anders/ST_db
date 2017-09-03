@@ -15,6 +15,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 
 
+
 engine = create_engine('sqlite:///ST.db')
 Base = declarative_base(bind=engine)
 DBSession = sessionmaker(bind=engine)
@@ -30,28 +31,23 @@ tag_table = Table("tag_table", Base.metadata,
     Column("inner_tag_id", Integer, ForeignKey("tag.id"), primary_key=True),
     Column("container_tag_id", Integer, ForeignKey("tag.id"), primary_key=True)
 )
+#
+#association_table = Table("association_table", Base.metadata,
+#     Column("lesion_id", Integer, ForeignKey("lesion.id"), primary_key = True),
+#     Column("tag_id", Integer, ForeignKey("tag.id"), primary_key = True)
+#)
 
-association_table = Table("association_table", Base.metadata,
-     Column("lesion_id", Integer, ForeignKey("lesion.id"), primary_key = True),
-     Column("tag_id", Integer, ForeignKey("tag.id"), primary_key = True)
-)
+
+class Association(Base):
+    __tablename__ = 'association'
+    lesion_id = Column(Integer, ForeignKey('lesion.id'), primary_key=True)
+    tag_id = Column(Integer, ForeignKey('tag.id'), primary_key=True)
+    upvotes = Column(Integer, default = 10)
+    downvotes = Column(Integer, default = 5)
+    lesion = relationship("Lesion", back_populates="tags")
+    tag = relationship("Tag", back_populates="lesions")
 
 
-#class Association(Base):
-#    __tablename__ = 'association'
-#    lesion_id = Column(Integer, ForeignKey('lesion.id'), primary_key=True)
-#    tag_id = Column(Integer, ForeignKey('tag.id'), primary_key=True)
-#    ppv = Column(Float)
-#    npv = Column(Float)
-#    lesion = relationship("Lesion", back_populates="tags")
-#    tag = relationship("Tag", back_populates="lesions")
-
-#class Combos(Base):
-#    __tablename__ = 'combos'
-#    lesion_id = Column(Integer, ForeignKey('lesion.id'), primary_key = True)
-#    tag1_id = Column(Integer, ForeignKey('tag.id'), primary_key=True)
-#    tag2_id = Column(Integer, ForeignKey('tag.id'), primary_key=True)
-#    lesion = relationship("Lesion", back_populates = "combos")
 
     
 class Lesion(Base):
@@ -65,23 +61,23 @@ class Lesion(Base):
     abs_incidence = Column(Float)
     # modifiable
 
-    #tags = relationship("Association", back_populates = "lesion")
-    #combos = relationship("Combos", back_populates = "lesion")
+    tags = relationship("Association", back_populates = "lesion")
+
     ddxs = relationship("Lesion",
                         secondary = ddx_table,
                         primaryjoin=id==ddx_table.c.main_dx_id,
-                        secondaryjoin=id==ddx_table.c.ddx_lesion_id)  
+                        secondaryjoin=id==ddx_table.c.ddx_lesion_id)              
 
 class Tag(Base):
     __tablename__ = 'tag'
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
-    lesions = relationship("Lesion",
-                           secondary = association_table,
-                           backref = "tags",
-                           lazy = "dynamic")
+#    lesions = relationship("Lesion",
+#                           secondary = association_table,
+#                           backref = "tags",
+#                           lazy = "dynamic")
     
-    #lesions = relationship("Association", back_populates = "tag")
+    lesions = relationship("Association", back_populates = "tag")
     discriminator = Column('type', String(50))
     containers = relationship("Tag",
                               secondary = tag_table,

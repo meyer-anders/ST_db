@@ -14,7 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.orm import backref
 
-from create_schema import Tag, Lesion, Association
+from create_schema import Tag, Lesion
 from functions import *
 
 engine = create_engine('sqlite:///ST.db')
