@@ -42,8 +42,8 @@ class Association(Base):
     __tablename__ = 'association'
     lesion_id = Column(Integer, ForeignKey('lesion.id'), primary_key=True)
     tag_id = Column(Integer, ForeignKey('tag.id'), primary_key=True)
-    upvotes = Column(Integer, default = 10)
-    downvotes = Column(Integer, default = 5)
+    upvotes = Column(Integer, default = 5)
+    downvotes = Column(Integer, default = 0)
     lesion = relationship("Lesion", back_populates="tags")
     tag = relationship("Tag", back_populates="lesions")
 
